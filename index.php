@@ -21,6 +21,12 @@ if( isset($_POST['solde']) ){
      header("location: .");
      exit;
 
+}elseif( isset($_POST['virer']) ){
+     extract($_POST);
+     $modele->viverVers($reference, $montant, $destination);
+     header("location: .");
+     exit;
+
 } elseif( isset($_GET['action']) ){
      $action = $_GET['action'];
 

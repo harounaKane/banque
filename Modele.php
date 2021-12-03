@@ -53,10 +53,35 @@ class Modele{
           // $stmt->execute( [$montant, $ref] );
      }
 
+     public function viverVers($reference, $montant, $destination){
+          $compteEmeteur = $this->getCompte($reference);
+          $titulaire = $this->getTitulaire($destination);
+          $compteDestinateire = $this->getCompteByTitulaire($titulaire->getId());
+
+          $compteEmeteur->virerVers($montant, $compteDestinateire);
+
+          $stmtEm = $this->pdo->prepare("UPDATE compte SET solde = ? WHERE reference = ?");
+          $stmtDest = $this->pdo->prepare("UPDATE compte SET solde = ? WHERE reference = ?");
+          $stmtEm->execute( [$compteEmeteur->getSolde(), $compteEmeteur->getReference()] );
+          $stmtDest->execute( [$compteDestinateire->getSolde(), $compteDestinateire->getReference()] );
+
+     }
+
      public function getCompte($referenceCompte){
           //RECUPERATION D'UN COMPTE'
           $stmt = $this->pdo->prepare("SELECT * FROM compte WHERE reference = ?");
           $stmt->execute([$referenceCompte]);
+          $resultat = $stmt->fetch();
+
+          $compte = new Compte($resultat);
+         
+          return $compte;
+     }
+
+     public function getCompteByTitulaire($referenceTitulaire){
+          //RECUPERATION D'UN COMPTE'
+          $stmt = $this->pdo->prepare("SELECT * FROM compte WHERE titulaire = ?");
+          $stmt->execute([$referenceTitulaire]);
           $resultat = $stmt->fetch();
 
           $compte = new Compte($resultat);
